@@ -15,44 +15,33 @@ function ConvertHandler() {
   }
 
   this.getNum = function(input) {
-    const index = this.getIndexOfFirstLetter(input);
-
-    if(index < 0) {
-      return "invalid unit";
-    }
-
-    const numStr = input.slice(0, index);
-
-    if(numStr == "") {  
-      return 1;
-    }
-
-    const slashIndex = numStr.indexOf("/");
-    if(slashIndex > -1) {
-      const firstNum = parseFloat(numStr.slice(0, slashIndex));
-      const secondNum = parseFloat(numStr.slice(slashIndex + 1, numStr.length));
-      return  firstNum / secondNum;
+    input = input.toLowerCase( ).match( /[^a-z]/gi ) || 1;
+    if(input !== 1) {
+        return this.divideFraction(input);
     } else {
-      return parseFloat(numStr);
+      return 1;
     }
   };
   
   this.getUnit = function(input) {
-    const index = this.getIndexOfFirstLetter(input);
+    input = input.toLowerCase().match(/[a-z]/gi);
 
-    if(index < 0) {
-      return "invalid unit";
-    }
+    const units = ["l", "gal", "mi", "lbs", "kg", "km"];
+    if(input && units.includes(input.join(""))) {
+      return input.join("");
+    } 
 
-    const validUnits = ['gal', 'l', 'mi', 'km', 'lbs', 'kg'];
-
-    const unitStr = input.slice(index).toLowerCase();
-    if(validUnits.indexOf(unitStr) < 0) {
-      return "invalid unit";
-    }
-
-    return unitStr;
+    return null;
   };
+
+  this.divideFraction = function(input) {
+    input = input.join( '' ).split( '/' );
+    if(input.length <= 2) {
+      return input.reduce( ( a,b ) => a / b );
+    } else {
+      return null;
+    }
+  }
   
   this.getReturnUnit = function(initUnit) {
     const returnUnits = {
@@ -69,12 +58,12 @@ function ConvertHandler() {
 
   this.spellOutUnit = function(unit) {
     const spelledOutUnits = {
-      gal: 'gallon',
-      l: 'liter',
-      mi: 'mile',
-      km: 'kilometer',
-      lbs: 'pound',
-      kg: 'kilogram'
+      gal: 'gallons',
+      l: 'liters',
+      mi: 'miles',
+      km: 'kilometers',
+      lbs: 'pounds',
+      kg: 'kilograms'
     };
 
     return spelledOutUnits[unit];
@@ -102,7 +91,7 @@ function ConvertHandler() {
     const spelledInitUnit = this.spellOutUnit(initUnit);
     const spelledReturnUnit = this.spellOutUnit(returnUnit);
 
-    return initNum + " " + initUnit + " converts to " + returnNum + " " + returnUnit;
+    return initNum + " " + spelledInitUnit + " converts to " + returnNum + " " + spelledReturnUnit;
   };
   
 }
